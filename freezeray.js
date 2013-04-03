@@ -8,7 +8,7 @@ function freeze_ray(obj, prefix){
 				if($.isArray(obj)){
 					stringRep = prefix + '[' + key +']';
 				} else {
-					stringRep = prefix + key;
+					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
 					// if($.isArray(obj)){
@@ -20,14 +20,14 @@ function freeze_ray(obj, prefix){
 						if(typeof(obj[key]) === "object"){
 							//output += '}\nit("checks the ' + stringRep + ' object"), function() {\n';
 							if($.isArray(obj[key])){
-								freeze(obj[key], stringRep);
+								output += freeze(obj[key], stringRep);
 							} else {
-								freeze(obj[key], stringRep + '.');
+								output += freeze(obj[key], stringRep);
 							}
 						} else if(typeof(obj[key]) === "string"){
 							output += '\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
-							output += '\texpects(' + stringRep + ').toBe(' + obj[key] + \n';\n';
+							output += '\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						}
 					}
 				}
@@ -37,16 +37,18 @@ function freeze_ray(obj, prefix){
 	}
 	console.log(output);
 }
+var queue = [];
 function freeze(obj, prefix){
+	var output = "";
 	if(obj && prefix){
-		output += '});\n\tit("checks the ' + stringRep + ' object", function() {\n';
+		output += '\tit("checks the ' + prefix + ' object", function() {\n';
 		for(var key in obj){
 			if (obj.hasOwnProperty(key)) {
 				var stringRep;
 				if($.isArray(obj)){
 					stringRep = prefix + '[' + key +']';
 				} else {
-					stringRep = prefix + key;
+					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
 					if($.isArray(obj)){
@@ -56,22 +58,28 @@ function freeze(obj, prefix){
 					}
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
-							// output += '\tit("checks the ' + stringRep + ' object"), function() {\n';
-							if($.isArray(obj[key])){
-								freeze(obj[key], stringRep);
-							} else {
-								freeze(obj[key], stringRep + '.');
-							}
+							//if($.isArray(obj[key])){
+							//output += freeze(obj[key], stringRep);
+							queue.push([obj[key], stringRep]);
+							// } else {
+							// 	output += freeze(obj[key], stringRep);
+							// 	queue.push([obj[key], stringRep]);
+							// }
 						} else if(typeof(obj[key]) === "string"){
 							output += '\t\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
-							output += '\t\texpects(' + stringRep + ').toBe(' + obj[key] + \n';\n';
+							output += '\t\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						}
 					}
 				}
 			}
 		}
 		output += '\t});\n';
+		if(queue.length){
+			var next = queue.pop();
+			output += freeze(next[0], next[1]);
+		}
 	}
+	return output;
 }
-freeze_ray(standaloneInstance, 'standaloneInstance');
+freeze_ray(AT, 'AT');
