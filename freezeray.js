@@ -63,6 +63,8 @@ function freeze(obj, prefix){
 							output += '\t\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
 							output += '\t\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
+						} else if(typeof(obj[key]) === "function"){
+							queue.push([obj[key], stringRep]);
 						}
 					}
 				}
