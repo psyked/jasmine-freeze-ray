@@ -58,13 +58,7 @@ function freeze(obj, prefix){
 					}
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
-							//if($.isArray(obj[key])){
-							//output += freeze(obj[key], stringRep);
 							queue.push([obj[key], stringRep]);
-							// } else {
-							// 	output += freeze(obj[key], stringRep);
-							// 	queue.push([obj[key], stringRep]);
-							// }
 						} else if(typeof(obj[key]) === "string"){
 							output += '\t\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
@@ -76,7 +70,7 @@ function freeze(obj, prefix){
 		}
 		output += '\t});\n';
 		if(queue.length){
-			var next = queue.pop();
+			var next = queue.shift();
 			output += freeze(next[0], next[1]);
 		}
 	}
