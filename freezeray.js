@@ -19,9 +19,9 @@ function freeze_ray(obj, prefix){
 								output += freeze(obj[key], stringRep);
 							}
 						} else if(typeof(obj[key]) === "string"){
-							output += '\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
+							output += '\texpect(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
-							output += '\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
+							output += '\texpect(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						}
 					}
 				}
@@ -48,14 +48,14 @@ function freeze(obj, prefix, stub){
 					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
-					output += '\t\texpects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
+					output += '\t\texpect(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
 							queue.push([obj[key], stringRep]);
 						} else if(typeof(obj[key]) === "string"){
-							output += '\t\texpects(' + stringRep + ').toBe("' + obj[key] + '");\n';
+							output += '\t\texpect(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
-							output += '\t\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
+							output += '\t\texpect(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						} else if(typeof(obj[key]) === "function"){
 							queue.push([obj[key], stringRep, true]);
 						}
