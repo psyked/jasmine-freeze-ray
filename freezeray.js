@@ -1,7 +1,7 @@
 function freeze_ray(obj, prefix){
 	var output = "";
 	if(obj && prefix){
-		output += 'describe("tests the ' + prefix + ' object", function() {\n';
+		output += '/*globals describe it expect */\ndescribe("tests the ' + prefix + ' object", function() {\n\t"use strict";\n';
 		output += freeze(obj, prefix);
 		output += '});\n';
 	}
@@ -40,7 +40,7 @@ function freeze(obj, prefix, stub){
 			}
 		}
 		if(stub === true){
-			output += "\t//\t test stub\n\t//";
+			output += "\t//\ttest stub\n\t//";
 		}
 		output += '\t});\n\n';
 		if(queue.length){
