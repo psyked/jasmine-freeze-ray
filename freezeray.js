@@ -11,14 +11,8 @@ function freeze_ray(obj, prefix){
 					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
-					// if($.isArray(obj)){
-					// 	output += '	expects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
-					// } else {
-					// 	output += '	expects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
-					// }
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
-							//output += '}\nit("checks the ' + stringRep + ' object"), function() {\n';
 							if($.isArray(obj[key])){
 								output += freeze(obj[key], stringRep);
 							} else {
@@ -38,10 +32,13 @@ function freeze_ray(obj, prefix){
 	console.log(output);
 }
 var queue = [];
-function freeze(obj, prefix){
+function freeze(obj, prefix, stub){
 	var output = "";
+	if(stub === true){
+		output += "\t//";
+	}
 	if(obj && prefix){
-		output += '\tit("checks the ' + prefix + ' object", function() {\n';
+		output += '\tit("checks the ' + prefix + ' ' + typeof(obj) + '", function() {\n';
 		for(var key in obj){
 			if (obj.hasOwnProperty(key)) {
 				var stringRep;
@@ -51,11 +48,7 @@ function freeze(obj, prefix){
 					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
-					if($.isArray(obj)){
-						output += '\t\texpects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
-					} else {
-						output += '\t\texpects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
-					}
+					output += '\t\texpects(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
 							queue.push([obj[key], stringRep]);
@@ -64,18 +57,20 @@ function freeze(obj, prefix){
 						} else if(typeof(obj[key]) === "number"){
 							output += '\t\texpects(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						} else if(typeof(obj[key]) === "function"){
-							queue.push([obj[key], stringRep]);
+							queue.push([obj[key], stringRep, true]);
 						}
 					}
 				}
 			}
 		}
-		output += '\t});\n';
+		if(stub === true){
+			output += "\t//\t test stub\n\t//";
+		}
+		output += '\t});\n\n';
 		if(queue.length){
 			var next = queue.shift();
-			output += freeze(next[0], next[1]);
+			output += freeze(next[0], next[1], next[2]);
 		}
 	}
 	return output;
 }
-freeze_ray(AT, 'AT');
