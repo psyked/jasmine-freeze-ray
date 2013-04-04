@@ -2,31 +2,7 @@ function freeze_ray(obj, prefix){
 	var output = "";
 	if(obj && prefix){
 		output += 'describe("tests the ' + prefix + ' object", function() {\n';
-		for(var key in obj){
-			if (obj.hasOwnProperty(key)) {
-				var stringRep;
-				if($.isArray(obj)){
-					stringRep = prefix + '[' + key +']';
-				} else {
-					stringRep = prefix + '.' + key;
-				}
-				if(key.indexOf("jQuery") === -1){
-					if(obj[key] && !obj[key].jquery){
-						if(typeof(obj[key]) === "object"){
-							if($.isArray(obj[key])){
-								output += freeze(obj[key], stringRep);
-							} else {
-								output += freeze(obj[key], stringRep);
-							}
-						} else if(typeof(obj[key]) === "string"){
-							output += '\texpect(' + stringRep + ').toBe("' + obj[key] + '");\n';
-						} else if(typeof(obj[key]) === "number"){
-							output += '\texpect(' + stringRep + ').toBe(' + obj[key] + ');\n';
-						}
-					}
-				}
-			}
-		}
+		output += freeze(obj, prefix);
 		output += '});\n';
 	}
 	console.log(output);
