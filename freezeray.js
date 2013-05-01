@@ -1,7 +1,7 @@
 function freeze_ray(obj, prefix){
 	var output = "";
 	if(obj && prefix){
-		output += '/*globals */\ndescribe("tests the ' + prefix + ' object", function() {\n\t"use strict";\n';
+		output += '/* globals */\ndescribe("tests the ' + prefix + ' object", function() {\n\t"use strict";\n';
 		output += freeze(obj, prefix);
 		output += '});\n';
 	}
@@ -14,7 +14,11 @@ function freeze(obj, prefix, stub){
 		output += "\t//";
 	}
 	if(obj && prefix){
-		output += '\n\tit("checks the ' + prefix + ' ' + typeof(obj) + '", function() {\n';
+		output += '\n';
+		if(stub === true){
+		        output += "\t//";
+	        }
+		output += '\tit("checks the ' + prefix + ' ' + typeof(obj) + '", function() {\n';
 		for(var key in obj){
 			if (obj.hasOwnProperty(key)) {
 				var stringRep;
