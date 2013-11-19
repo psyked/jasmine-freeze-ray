@@ -1,22 +1,24 @@
-function freeze_ray(obj, prefix){
+function freeze_ray(prefix){
+	var obj = eval(prefix);
 	var output = "";
 	if(obj && prefix){
-		output += '/* globals */\ndescribe("tests the ' + prefix + ' object", function() {\n\t"use strict";\n';
-		output += freeze(obj, prefix);
+		output += '/* global */\ndescribe("tests the ' + prefix + ' object", function() {\n    "use strict";\n';
+		output += freeze(prefix);
 		output += '});\n';
 	}
 	console.log(output);
 }
 var queue = [];
-function freeze(obj, prefix, stub){
+function freeze(prefix, stub){
+	var obj = eval(prefix);
 	var output = "";
 	if(stub === true){
-		output += "\t//";
+		output += "\n";
 	}
 	if(obj && prefix){
 		output += '\n';
 		if(stub === true){
-		        output += "\t//";
+		        output += "\n";
 	        }
 		output += '\tit("checks the ' + prefix + ' ' + typeof(obj) + '", function() {\n';
 		for(var key in obj){
@@ -28,14 +30,14 @@ function freeze(obj, prefix, stub){
 					stringRep = prefix + '.' + key;
 				}
 				if(key.indexOf("jQuery") === -1){
-					output += '\t\texpect(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
+					output += '        expect(typeof(' + stringRep + ')).toBe("' + typeof(obj[key]) + '");\n';
 					if(obj[key] && !obj[key].jquery){
 						if(typeof(obj[key]) === "object"){
 							queue.push([obj[key], stringRep]);
 						} else if(typeof(obj[key]) === "string"){
-							output += '\t\texpect(' + stringRep + ').toBe("' + obj[key] + '");\n';
+							output += '        expect(' + stringRep + ').toBe("' + obj[key] + '");\n';
 						} else if(typeof(obj[key]) === "number"){
-							output += '\t\texpect(' + stringRep + ').toBe(' + obj[key] + ');\n';
+							output += '        expect(' + stringRep + ').toBe(' + obj[key] + ');\n';
 						} else if(typeof(obj[key]) === "function"){
 							queue.push([obj[key], stringRep, true]);
 						}
@@ -44,12 +46,12 @@ function freeze(obj, prefix, stub){
 			}
 		}
 		if(stub === true){
-			output += "\t//\t\t// test stub\n\t//";
+			output += "        // arrange\n\n        // act\n\n        // assert\n\n";
 		}
 		output += '\t});\n';
 		if(queue.length){
 			var next = queue.shift();
-			output += freeze(next[0], next[1], next[2]);
+			output += freeze(next[1], next[2]);
 		}
 	}
 	return output;
